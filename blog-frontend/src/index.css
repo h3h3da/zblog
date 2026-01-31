@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #fafafa;
+  --text: #1a1a1a;
+  --muted: #666;
+  --border: #e5e5e5;
+}
+
+.dark {
+  --bg: #111;
+  --text: #e5e5e5;
+  --muted: #a3a3a3;
+  --border: #333;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.prose pre,
+.prose code {
+  @apply rounded bg-neutral-200 dark:bg-neutral-800 px-1 py-0.5;
+}
+.prose pre {
+  @apply p-4 overflow-x-auto;
+}
