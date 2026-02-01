@@ -56,7 +56,7 @@
   ```bash
   cd blog-frontend && npm install && npm run dev
   ```
-- 访问博客: http://localhost:5173，API: http://localhost:8000。
+- 访问博客: `http://localhost:5173`，API: `http://localhost:8000`。
 
 **管理后台（仅本地，直连 MySQL）**
 
@@ -70,7 +70,7 @@
   cd admin/backend && pip install -r requirements.txt && uvicorn app.main:app --reload --port 8001
   cd admin/frontend && npm install && npm run dev
   ```
-- 访问管理后台: http://localhost:5174，登录后即可管理文章、标签、评论、About。博客页面不包含任何后台入口。
+- 访问管理后台: `http://localhost:5174`，登录后即可管理文章、标签、评论、About。博客页面不包含任何后台入口。
 
 ## 目录结构
 
