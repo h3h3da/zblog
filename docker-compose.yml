@@ -1,4 +1,4 @@
-# 云服务器一键部署：博客前端 + blog-api + MySQL
+# 本地/云服务器一键部署：MySQL + 博客前端 + blog-api + 管理后台前端 + admin-backend
 # 使用方式：复制 .env.example 为 .env 并填写真实值，然后 docker-compose up -d
 
 services:
@@ -9,7 +9,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-zblog}
       MYSQL_USER: ${MYSQL_USER:-zblog}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-zblog}
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
@@ -27,6 +27,8 @@ services:
     environment:
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
     depends_on:
       mysql:
         condition: service_healthy
@@ -38,9 +40,37 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      VITE_API_BASE_URL: ${BLOG_API_URL:-http://localhost:8000}
+      VITE_API_BASE_URL: ${BLOG_API_URL:-}
+    depends_on:
+      - blog-api
     ports:
       - "5173:80"
+
+  admin-backend:
+    build: ./admin/backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_USER:-zblog}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-zblog}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-zblog}
+      JWT_SECRET: ${JWT_SECRET:-local-docker-secret-change-in-production}
+      BLOG_PUBLIC_URL: ${BLOG_PUBLIC_URL:-http://localhost:5173}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8001:8001"
+
+  admin-frontend:
+    build: ./admin/frontend
+    restart: unless-stopped
+    depends_on:
+      - admin-backend
+    ports:
+      - "5174:80"
 
 volumes:
   mysql_data:

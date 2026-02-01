@@ -1,9 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import { pages } from "../api/client";
 
 export default function AboutEdit() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -23,7 +25,10 @@ export default function AboutEdit() {
 
   const updatePage = useMutation({
     mutationFn: () => pages.update("about", { title, content }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["about-page"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["about-page"] });
+      navigate("/");
+    },
   });
 
   if (isLoading) return <div>加载中...</div>;

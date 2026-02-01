@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, posts, tags, comments, pages
+from app.routers import auth, posts, tags, comments, pages, site, stats
 
 app = FastAPI(title="zblog Admin API", version="0.1.0")
 
@@ -17,6 +17,8 @@ app.include_router(posts.router, prefix="/api")
 app.include_router(tags.router, prefix="/api")
 app.include_router(comments.router, prefix="/api")
 app.include_router(pages.router, prefix="/api")
+app.include_router(site.router, prefix="/api")
+app.include_router(stats.router, prefix="/api")
 
 
 @app.get("/health")

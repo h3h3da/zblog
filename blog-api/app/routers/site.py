@@ -14,4 +14,8 @@ def get_site(db: Session = Depends(get_db)):
     return SiteInfo(
         title=data.get("title"),
         description=data.get("description"),
+        nav_home=data.get("nav_home"),
+        nav_tags=data.get("nav_tags"),
+        nav_about=data.get("nav_about"),
+        footer=data.get("footer"),
     )

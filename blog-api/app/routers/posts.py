@@ -21,7 +21,7 @@ def list_posts(
     if tag:
         q = q.join(post_tags).join(Tag).filter(Tag.slug == tag)
     total = q.count()
-    items = q.order_by(Post.published_at.desc().nulls_last()).offset((page - 1) * size).limit(size).all()
+    items = q.order_by(Post.published_at.desc()).offset((page - 1) * size).limit(size).all()
     return PostListResponse(
         items=[_post_to_list(p) for p in items],
         total=total,

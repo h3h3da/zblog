@@ -1,0 +1,56 @@
+# 云端一键部署：仅 MySQL + 博客前端 + blog-api（不包含管理后台）
+# 管理后台在本地运行，通过 SSH 隧道连接云端 MySQL
+# 使用方式：cp .env.cloud.example .env 并填写真实值，然后：
+#   docker-compose -f docker-compose.cloud.yml up -d
+
+services:
+  mysql:
+    image: mysql:8
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-zblog}
+      MYSQL_USER: ${MYSQL_USER:-zblog}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-zblog}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "127.0.0.1:3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  blog-api:
+    build: ./blog-api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_USER:-zblog}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-zblog}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-zblog}
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  blog-frontend:
+    build:
+      context: ./blog-frontend
+      args:
+        VITE_API_BASE_URL: ${BLOG_API_URL:-}
+    restart: unless-stopped
+    depends_on:
+      - blog-api
+    ports:
+      - "80:80"
+
+volumes:
+  mysql_data:

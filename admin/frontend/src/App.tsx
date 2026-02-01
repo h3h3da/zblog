@@ -9,6 +9,7 @@ import PostEdit from "./pages/PostEdit";
 import TagList from "./pages/TagList";
 import CommentList from "./pages/CommentList";
 import AboutEdit from "./pages/AboutEdit";
+import SiteSettings from "./pages/SiteSettings";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { data, isLoading, error } = useQuery({
@@ -33,6 +34,7 @@ function App() {
         <Route path="tags" element={<TagList />} />
         <Route path="comments" element={<CommentList />} />
         <Route path="about" element={<AboutEdit />} />
+        <Route path="site" element={<SiteSettings />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

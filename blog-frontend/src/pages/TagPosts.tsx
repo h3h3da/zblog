@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
-import { tags } from "../api/client";
+import { posts } from "../api/client";
 
 export default function TagPosts() {
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, error } = useQuery({
     queryKey: ["tag-posts", slug],
-    queryFn: () => tags.posts(slug!, { page: 1, size: 20 }),
+    queryFn: () => posts.list({ tag: slug!, page: 1, size: 20 }),
     enabled: !!slug,
   });
 

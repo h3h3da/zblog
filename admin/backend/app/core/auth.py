@@ -1,6 +1,6 @@
+import bcrypt
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
@@ -8,16 +8,18 @@ from app.core.config import settings
 from app.core.database import get_db
 from app.models import User
 
-pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer(auto_error=False)
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_ctx.verify(plain, hashed)
+    # Use bcrypt directly; passlib + bcrypt 4.1+ can raise (e.g. 72-byte limit in internal test)
+    raw = plain.encode("utf-8")[:72]
+    return bcrypt.checkpw(raw, hashed.encode("utf-8") if isinstance(hashed, str) else hashed)
 
 
 def hash_password(password: str) -> str:
-    return pwd_ctx.hash(password)
+    raw = password.encode("utf-8")[:72]
+    return bcrypt.hashpw(raw, bcrypt.gensalt()).decode("utf-8")
 
 
 def create_access_token(sub: str) -> str:

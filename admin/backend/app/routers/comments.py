@@ -5,14 +5,19 @@ from datetime import datetime
 from typing import Optional, List
 from app.core.database import get_db
 from app.core.auth import get_current_user
-from app.models import User, Comment
+from app.core.config import settings
+from app.models import User, Comment, Post
 
 router = APIRouter(prefix="/comments", tags=["comments"])
 
 
 class CommentOut(BaseModel):
     id: int
-    post_id: int
+    post_id: Optional[int] = None
+    page_slug: Optional[str] = None
+    post_slug: Optional[str] = None
+    post_title: Optional[str] = None
+    post_url: Optional[str] = None
     parent_id: Optional[int]
     author_name: str
     author_email: str
@@ -43,19 +48,35 @@ def list_comments(
     if status:
         q = q.filter(Comment.status == status)
     items = q.offset((page - 1) * size).limit(size).all()
-    return [
-        CommentOut(
-            id=c.id,
-            post_id=c.post_id,
-            parent_id=c.parent_id,
-            author_name=c.author_name,
-            author_email=c.author_email,
-            content=c.content,
-            status=c.status,
-            created_at=c.created_at,
+    base_url = (settings.BLOG_PUBLIC_URL or "").rstrip("/")
+    result = []
+    for c in items:
+        if c.post_id is not None:
+            post = db.query(Post).filter(Post.id == c.post_id).first()
+            post_slug = post.slug if post else None
+            post_title = post.title if post else None
+            post_url = f"{base_url}/post/{post_slug}" if base_url and post_slug else None
+        else:
+            post_slug = c.page_slug
+            post_title = f"页面: {c.page_slug}" if c.page_slug else None
+            post_url = f"{base_url}/{c.page_slug}" if base_url and c.page_slug else None
+        result.append(
+            CommentOut(
+                id=c.id,
+                post_id=c.post_id,
+                page_slug=c.page_slug,
+                post_slug=post_slug,
+                post_title=post_title,
+                post_url=post_url,
+                parent_id=c.parent_id,
+                author_name=c.author_name,
+                author_email=c.author_email,
+                content=c.content,
+                status=c.status,
+                created_at=c.created_at,
+            )
         )
-        for c in items
-    ]
+    return result
 
 
 @router.put("/{comment_id}/status")

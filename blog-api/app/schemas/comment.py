@@ -22,7 +22,8 @@ class CommentCreate(BaseModel):
 
 class CommentList(BaseModel):
     id: int
-    post_id: int
+    post_id: Optional[int] = None
+    page_slug: Optional[str] = None
     parent_id: Optional[int] = None
     author_name: str
     content: str

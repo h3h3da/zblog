@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { tags } from "../api/client";
+import { tags, type Tag } from "../api/client";
 
 export default function TagList() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
@@ -16,8 +18,7 @@ export default function TagList() {
     mutationFn: () => tags.create({ name, slug: slug || name.replace(/\s+/g, "-").toLowerCase() }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tags"] });
-      setName("");
-      setSlug("");
+      navigate("/");
     },
   });
 
@@ -65,7 +66,7 @@ export default function TagList() {
         {createTag.isError && <p className="text-red-500 text-sm mt-2">{String(createTag.error)}</p>}
       </div>
       <ul className="bg-white rounded-lg shadow divide-y">
-        {list?.map((t) => (
+        {list?.map((t: Tag) => (
           <li key={t.id} className="px-4 py-3 flex justify-between items-center">
             <span className="font-medium">{t.name}</span>
             <span className="text-gray-500 text-sm">{t.slug}</span>

@@ -23,6 +23,7 @@ export default function Layout() {
             <Link to="/tags" className="text-gray-600 hover:text-gray-900">标签</Link>
             <Link to="/comments" className="text-gray-600 hover:text-gray-900">评论</Link>
             <Link to="/about" className="text-gray-600 hover:text-gray-900">About</Link>
+            <Link to="/site" className="text-gray-600 hover:text-gray-900">站点设置</Link>
             <button type="button" onClick={handleLogout} className="text-gray-600 hover:text-gray-900">
               退出
             </button>

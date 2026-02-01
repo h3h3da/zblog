@@ -7,7 +7,8 @@ class Comment(Base):
     __tablename__ = "comments"
 
     id = Column(Integer, primary_key=True, index=True)
-    post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), nullable=False, index=True)
+    post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), nullable=True, index=True)
+    page_slug = Column(String(64), nullable=True, index=True)  # 页面评论时使用，如 "about"
     parent_id = Column(Integer, ForeignKey("comments.id", ondelete="CASCADE"))
     author_name = Column(String(64), nullable=False)
     author_email = Column(String(255), nullable=False)

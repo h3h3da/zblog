@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { comments } from "../api/client";
+import { comments, type Comment } from "../api/client";
 
 export default function CommentList() {
   const queryClient = useQueryClient();
@@ -21,9 +21,9 @@ export default function CommentList() {
 
   if (isLoading) return <div>加载中...</div>;
 
-  const pending = list?.filter((c) => c.status === "pending") ?? [];
-  const approved = list?.filter((c) => c.status === "approved") ?? [];
-  const rejected = list?.filter((c) => c.status === "rejected") ?? [];
+  const pending = list?.filter((c: Comment) => c.status === "pending") ?? [];
+  const approved = list?.filter((c: Comment) => c.status === "approved") ?? [];
+  const rejected = list?.filter((c: Comment) => c.status === "rejected") ?? [];
 
   return (
     <div>
@@ -32,7 +32,7 @@ export default function CommentList() {
         待审核: {pending.length} · 已通过: {approved.length} · 已拒绝: {rejected.length}
       </p>
       <ul className="space-y-4">
-        {(list ?? []).map((c) => (
+        {(list ?? []).map((c: Comment) => (
           <li key={c.id} className="bg-white p-4 rounded-lg shadow">
             <div className="flex justify-between items-start">
               <div>
@@ -51,7 +51,20 @@ export default function CommentList() {
                 </span>
                 <p className="mt-2 text-gray-700">{c.content}</p>
                 <p className="text-gray-400 text-sm mt-1">
-                  {new Date(c.created_at).toLocaleString("zh-CN")} · 文章 ID: {c.post_id}
+                  {new Date(c.created_at).toLocaleString("zh-CN")}
+                  {" · "}
+                  {c.post_url && c.post_title ? (
+                    <a
+                      href={c.post_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      《{c.post_title}》
+                    </a>
+                  ) : (
+                    <>文章 ID: {c.post_id}</>
+                  )}
                 </p>
               </div>
               <div className="flex gap-2">

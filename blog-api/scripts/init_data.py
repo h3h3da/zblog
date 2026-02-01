@@ -8,10 +8,8 @@ from sqlalchemy.orm import sessionmaker
 from app.core.config import settings
 from app.core.database import engine
 from app.models import Page, SiteConfig
-from app.core.database import Base
 
-# Ensure tables exist (e.g. after Alembic upgrade)
-Base.metadata.create_all(bind=engine)
+# Tables are created by Alembic in entrypoint; do not create_all here
 Session = sessionmaker(bind=engine)
 
 
@@ -28,7 +26,14 @@ def main():
         else:
             print("About page already exists.")
 
-        for key, value in [("title", "zblog"), ("description", "My blog")]:
+        defaults = [
+            ("title", "zblog"),
+            ("description", "My blog"),
+            ("nav_home", "首页"),
+            ("nav_tags", "标签"),
+            ("nav_about", "About"),
+        ]
+        for key, value in defaults:
             row = session.query(SiteConfig).filter(SiteConfig.key == key).first()
             if not row:
                 session.add(SiteConfig(key=key, value=value))

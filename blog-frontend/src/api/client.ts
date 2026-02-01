@@ -34,22 +34,32 @@ export const tags = {
     if (params?.size) sp.set("size", String(params.size));
     const q = sp.toString();
     return api<{ items: Post[]; total: number; page: number; size: number }>(
-      `/api/tags/${slug}/posts${q ? `?${q}` : ""}`
+      `/api/tags/${encodeURIComponent(slug)}/posts${q ? `?${q}` : ""}`
     );
   },
 };
 
 export const comments = {
-  list: (postId: number, params?: { page?: number; size?: number }) => {
-    const sp = new URLSearchParams({ post_id: String(postId) });
-    if (params?.page) sp.set("page", String(params.page));
-    if (params?.size) sp.set("size", String(params.size));
+  list: (
+    params: { post_id?: number; page_slug?: string; page?: number; size?: number }
+  ) => {
+    const sp = new URLSearchParams();
+    if (params.post_id != null) sp.set("post_id", String(params.post_id));
+    if (params.page_slug) sp.set("page_slug", params.page_slug);
+    if (params.page) sp.set("page", String(params.page));
+    if (params.size) sp.set("size", String(params.size));
     return api<{ items: Comment[]; total: number; page: number; size: number }>(
       `/api/comments?${sp.toString()}`
     );
   },
-  create: (body: { author_name: string; author_email: string; content: string; post_id: number }) =>
-    api<Comment>("/api/comments", { method: "POST", body: JSON.stringify(body) }),
+  create: (body: {
+    author_name: string;
+    author_email: string;
+    content: string;
+    post_id?: number;
+    page_slug?: string;
+    parent_id?: number;
+  }) => api<Comment>("/api/comments", { method: "POST", body: JSON.stringify(body) }),
 };
 
 export const pages = {
@@ -57,7 +67,15 @@ export const pages = {
 };
 
 export const site = {
-  info: () => api<{ title?: string; description?: string }>("/api/site"),
+  info: () =>
+    api<{
+      title?: string;
+      description?: string;
+      nav_home?: string;
+      nav_tags?: string;
+      nav_about?: string;
+      footer?: string;
+    }>("/api/site"),
 };
 
 export type Tag = { id: number; name: string; slug: string; post_count?: number };
@@ -76,7 +94,8 @@ export type Post = {
 export type PostDetail = Post & { content: string };
 export type Comment = {
   id: number;
-  post_id: number;
+  post_id?: number;
+  page_slug?: string;
   parent_id?: number;
   author_name: string;
   content: string;

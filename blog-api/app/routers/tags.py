@@ -14,7 +14,7 @@ router = APIRouter(prefix="/api/tags", tags=["tags"])
 def list_tags(db: Session = Depends(get_db)):
     rows = (
         db.query(Tag.id, Tag.name, Tag.slug, func.count(Post.id).label("post_count"))
-        .outerjoin(post_tags)
+        .outerjoin(post_tags, Tag.id == post_tags.c.tag_id)
         .outerjoin(Post, and_(Post.id == post_tags.c.post_id, Post.status == "published"))
         .group_by(Tag.id, Tag.name, Tag.slug)
         .all()
@@ -36,7 +36,7 @@ def list_posts_by_tag(
         return PostListResponse(items=[], total=0, page=page, size=size)
     q = db.query(Post).join(post_tags).filter(post_tags.c.tag_id == tag.id, Post.status == "published")
     total = q.count()
-    items = q.order_by(Post.published_at.desc().nulls_last()).offset((page - 1) * size).limit(size).all()
+    items = q.order_by(Post.published_at.desc()).offset((page - 1) * size).limit(size).all()
     return PostListResponse(
         items=[_post_to_list(p) for p in items],
         total=total,

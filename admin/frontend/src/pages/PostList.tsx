@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { posts } from "../api/client";
+import { posts, type Post } from "../api/client";
 
 export default function PostList() {
   const { data: list, isLoading } = useQuery({
@@ -23,7 +23,7 @@ export default function PostList() {
       </div>
       {list?.length ? (
         <ul className="bg-white rounded-lg shadow overflow-hidden">
-          {list.map((p) => (
+          {list.map((p: Post) => (
             <li
               key={p.id}
               className="border-b border-gray-100 last:border-0 px-4 py-3 flex justify-between items-center"

@@ -84,6 +84,33 @@ export const pages = {
     api<Page>(`/api/pages/${slug}`, { method: "PUT", body: JSON.stringify(body) }),
 };
 
+export type SiteConfig = {
+  title?: string;
+  description?: string;
+  nav_home?: string;
+  nav_tags?: string;
+  nav_about?: string;
+  footer?: string;
+};
+
+export const siteConfig = {
+  get: () => api<SiteConfig>("/api/site"),
+  update: (body: SiteConfig) =>
+    api<SiteConfig>("/api/site", { method: "PUT", body: JSON.stringify(body) }),
+};
+
+export type Stats = {
+  total_views: number;
+  post_count: number;
+  published_post_count: number;
+  comment_count: number;
+  tag_count: number;
+};
+
+export const stats = {
+  get: () => api<Stats>("/api/stats"),
+};
+
 export type Post = {
   id: number;
   title: string;
@@ -116,7 +143,11 @@ export type Tag = { id: number; name: string; slug: string };
 
 export type Comment = {
   id: number;
-  post_id: number;
+  post_id?: number;
+  page_slug?: string;
+  post_slug?: string;
+  post_title?: string;
+  post_url?: string;
   parent_id?: number;
   author_name: string;
   author_email: string;

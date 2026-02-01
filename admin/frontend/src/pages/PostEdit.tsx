@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import ReactMarkdown from "react-markdown";
-import { posts, tags } from "../api/client";
+import { posts, tags, type Tag } from "../api/client";
 
 export default function PostEdit() {
   const { id } = useParams<{ id: string }>();
@@ -52,7 +52,7 @@ export default function PostEdit() {
     mutationFn: posts.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts-list"] });
-      navigate("/posts");
+      navigate("/");
     },
   });
 
@@ -61,6 +61,7 @@ export default function PostEdit() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts-list"] });
       queryClient.invalidateQueries({ queryKey: ["post", id] });
+      navigate("/");
     },
   });
 
@@ -143,7 +144,7 @@ export default function PostEdit() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">标签</label>
           <div className="flex flex-wrap gap-2">
-            {tagList?.map((t) => (
+            {tagList?.map((t: Tag) => (
               <label key={t.id} className="inline-flex items-center gap-1 cursor-pointer">
                 <input
                   type="checkbox"

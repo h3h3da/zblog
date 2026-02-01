@@ -10,7 +10,7 @@ export default function Login() {
 
   const login = useMutation({
     mutationFn: () => auth.login(username, password),
-    onSuccess: (data) => {
+    onSuccess: (data: { access_token: string }) => {
       localStorage.setItem("zblog_admin_token", data.access_token);
       navigate("/", { replace: true });
     },
